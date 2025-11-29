@@ -1,0 +1,84 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Template
+metadata:
+  name: basic-chatbot
+  labels:
+    version: "1.0.0"
+  annotations:
+    description: Minimal chatbot template (mock provider)
+spec:
+  variables:
+    - name: project_name
+      required: true
+      default: my-chatbot-tests
+  files:
+    - path: arena.yaml
+      content: |
+        apiVersion: promptkit.altairalabs.ai/v1alpha1
+        kind: Arena
+        metadata:
+          name: {{ .project_name }}
+        spec:
+          providers:
+            - file: providers/mock.yaml
+          scenarios:
+            - file: scenarios/basic.yaml
+    - path: providers/mock.yaml
+      content: |
+        apiVersion: promptkit.altairalabs.ai/v1alpha1
+        kind: Provider
+        metadata:
+          name: mock
+        spec:
+          id: mock
+          type: mock
+          model: mock-model
+          defaults:
+            temperature: 0.0
+          additional_config:
+            mock_config: prompts/mock-responses.yaml
+    - path: prompts/assistant.yaml
+      content: |
+        apiVersion: promptkit.altairalabs.ai/v1alpha1
+        kind: PromptConfig
+        metadata:
+          name: assistant
+        spec:
+          task_type: chat
+          version: "1.0.0"
+          description: Basic assistant prompt
+          system_template: |
+            You are a helpful assistant.
+          variables: []
+    - path: scenarios/basic.yaml
+      content: |
+        apiVersion: promptkit.altairalabs.ai/v1alpha1
+        kind: Scenario
+        metadata:
+          name: basic
+        spec:
+          id: basic
+          task_type: chat
+          turns:
+            - role: user
+              content: "Hello!"
+              assertions:
+                - type: content_includes
+                  params:
+                    patterns: ["Hello"]
+          conversation_assertions: []
+    - path: prompts/mock-responses.yaml
+      content: |
+        responses:
+          - role: assistant
+            content: "Hello from mock!"
+    - path: README.md
+      content: |
+        # Basic Chatbot Template
+        
+        Generated files:
+        - arena.yaml
+        - providers/mock.yaml
+        - prompts/assistant.yaml
+        - prompts/mock-responses.yaml
+        - scenarios/basic.yaml
