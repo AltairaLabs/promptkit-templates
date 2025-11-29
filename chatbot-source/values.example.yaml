@@ -1,0 +1,3 @@
+project_name: my-chatbot-source
+model: mock-model
+greeting: "Hello from source!"

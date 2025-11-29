@@ -1,0 +1,51 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Template
+metadata:
+  name: chatbot-source
+  labels:
+    version: "1.0.0"
+  annotations:
+    description: Chatbot template using external source files
+spec:
+  variables:
+    - name: project_name
+      required: true
+      default: my-chatbot-source
+    - name: greeting
+      required: false
+      default: "Hello!"
+    - name: model
+      required: false
+      default: mock-model
+  files:
+    - path: arena.yaml
+      content: |
+        apiVersion: promptkit.altairalabs.ai/v1alpha1
+        kind: Arena
+        metadata:
+          name: {{ .project_name }}
+        spec:
+          providers:
+            - file: providers/mock.yaml
+          scenarios:
+            - file: scenarios/basic.yaml
+    - path: providers/mock.yaml
+      source: providers/mock.yaml
+    - path: prompts/assistant.yaml
+      source: prompts/assistant.yaml
+    - path: prompts/mock-responses.yaml
+      source: prompts/mock-responses.yaml
+    - path: scenarios/basic.yaml
+      source: scenarios/basic.yaml
+    - path: README.md
+      content: |
+        # Chatbot Template (source-based)
+
+        This template demonstrates using the `source` field to include external files from the template package.
+
+        Generated files:
+        - arena.yaml
+        - providers/mock.yaml
+        - prompts/assistant.yaml
+        - prompts/mock-responses.yaml
+        - scenarios/basic.yaml

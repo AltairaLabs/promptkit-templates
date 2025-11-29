@@ -1,0 +1,15 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Scenario
+metadata:
+  name: basic
+spec:
+  id: basic
+  task_type: chat
+  turns:
+    - role: user
+      content: "Hello!"
+      assertions:
+        - type: content_includes
+          params:
+            patterns: ["Hello"]
+  conversation_assertions: []

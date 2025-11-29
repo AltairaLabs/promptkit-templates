@@ -1,0 +1,11 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: PromptConfig
+metadata:
+  name: assistant
+spec:
+  task_type: chat
+  version: "1.0.0"
+  description: Basic assistant prompt
+  system_template: |
+    You are a helpful assistant.
+  variables: []

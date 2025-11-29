@@ -1,6 +1,6 @@
 # PromptKit Community Templates
 
-Index of community templates for PromptArena. The index is K8s-style:
+Community templates for PromptArena. The index follows the Kubernetes-style resource shape:
 
 ```yaml
 apiVersion: promptkit.altairalabs.ai/v1
@@ -14,27 +14,50 @@ spec:
       tags: [chatbot, mock]
 ```
 
-Templates are package files (YAML) with embedded files under `files:`. Example `basic-chatbot/template.yaml` includes Arena config, providers, prompts, scenarios, and README.
+Each entry points to a template package (`template.yaml`) plus any referenced files. We also include a `chatbot-source` example that uses the new `files[].source` field to load external content instead of embedding everything inline.
 
-## Usage
+## Quick start
 
-List from this repo:
+Install the CLI (requires Node):
+
 ```bash
-promptarena templates list --index https://raw.githubusercontent.com/AltairaLabs/promptkit-templates/main/index.yaml
+npm install -g @altairalabs/promptarena
 ```
 
-Fetch/render:
+Generate a project from a remote template:
+
 ```bash
-promptarena templates fetch --index https://raw.githubusercontent.com/AltairaLabs/promptkit-templates/main/index.yaml --template basic-chatbot --version 1.0.0
-promptarena templates render --template basic-chatbot --version 1.0.0 --values values.yaml --out ./out
+# See what’s available (uses the default community repo; no index URL needed)
+promptarena templates list
+
+# List with repo prefix (when multiple repos are configured)
+promptarena templates list --index community
+
+# Render the basic chatbot template (from the community repo)
+# Fetch it into cache (one time)
+promptarena templates fetch --template basic-chatbot --version 1.0.0
+
+# Render from cache
+promptarena templates render \
+  --template basic-chatbot \
+  --version 1.0.0 \
+  --values values.example.yaml \
+  --out ./out
+
+# Or initialize a new project directly
+promptarena init --template basic-chatbot
+
+# Add another repo (optional) and list from it
+promptarena templates repo add --name internal --url https://example.com/index.yaml
+promptarena templates list --index internal
 ```
 
-Init with remote template:
-```bash
-promptarena init --template basic-chatbot --template-index https://raw.githubusercontent.com/AltairaLabs/promptkit-templates/main/index.yaml
-```
+## Templates
+
+- `basic-chatbot` — minimal mock-provider chatbot with inline file content.
+- `chatbot-source` — similar chatbot, but uses `files[].source` to pull file bodies from separate files in the template package.
 
 ## Contributing
 - Add template packages under a directory matching the template name.
-- Update `index.yaml` with the new entry (apiVersion `promptkit.altairalabs.ai/v1`, kind `TemplateIndex`).
+- Update `index.yaml` with the new entry (`apiVersion: promptkit.altairalabs.ai/v1`, `kind: TemplateIndex`).
 - Keep versions semver-like (major.minor.patch).
