@@ -1,0 +1,5 @@
+project_name: iot-maintenance-demo
+customer_id: acme-corp
+customer_name: ACME Corporation
+openai_model: gpt-4o-mini
+judge_model: gpt-4o-mini

@@ -1,0 +1,8 @@
+# Mock judge response (always pass)
+scenarios:
+  judge-security:
+    turns:
+      1:
+        response: '{"passed": true, "score": 1.0, "reasoning": "mock judge pass"}'
+
+default_response: '{"passed": true, "score": 1.0, "reasoning": "mock judge default"}'

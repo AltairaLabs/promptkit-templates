@@ -12,3 +12,8 @@ spec:
       description: Chatbot template using external source files
       source: chatbot-source/template.yaml
       tags: [chatbot, source]
+    - name: iot-maintenance-demo
+      version: "1.0.0"
+      description: IoT predictive maintenance demo with red-team self-play and assertions
+      source: iot-maintenance-demo/template.yaml
+      tags: [iot, demo, self-play, security]

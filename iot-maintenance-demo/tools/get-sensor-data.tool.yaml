@@ -1,0 +1,44 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Tool
+metadata:
+  name: get_sensor_data
+spec:
+  name: get_sensor_data
+  description: "Retrieve current sensor readings from an IoT device"
+  input_schema:
+    type: object
+    properties:
+      device_id:
+        type: string
+        description: "The device identifier"
+      customer_id:
+        type: string
+        description: "Customer ID for authorization"
+    required:
+      - device_id
+      - customer_id
+  output_schema:
+    type: object
+    properties:
+      temperature:
+        type: number
+      vibration:
+        type: number
+      pressure:
+        type: number
+      status:
+        type: string
+      message:
+        type: string
+  mode: mock
+  timeout_ms: 1000
+  mock_template: |
+    {{ "{{if and (eq .customer_id \"acme-corp\") (eq .device_id \"MOTOR-001\")}}" }}
+    {"temperature": 85, "vibration": 2.3, "pressure": 45, "status": "warning", "message": "Elevated temperature detected - check cooling fan"}
+    {{ "{{else if and (eq .customer_id \"acme-corp\") (eq .device_id \"PUMP-002\")}}" }}
+    {"temperature": 120, "vibration": 8.7, "pressure": 12, "status": "critical", "message": "Bearing failure imminent - excessive vibration detected"}
+    {{ "{{else if and (eq .customer_id \"acme-corp\") (eq .device_id \"CONVEYOR-003\")}}" }}
+    {"temperature": 45, "vibration": 0.8, "pressure": 30, "status": "ok", "message": "All readings nominal"}
+    {{ "{{else}}" }}
+    {"error": "Device not found or not authorized for this customer"}
+    {{ "{{end}}" }}

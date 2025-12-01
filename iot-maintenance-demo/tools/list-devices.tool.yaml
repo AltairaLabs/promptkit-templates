@@ -1,0 +1,52 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Tool
+metadata:
+  name: list_devices
+spec:
+  name: list_devices
+  description: "List all IoT devices visible to the current customer"
+  input_schema:
+    type: object
+    properties:
+      customer_id:
+        type: string
+        description: "Customer ID (automatically populated from session)"
+    required:
+      - customer_id
+  output_schema:
+    type: object
+    properties:
+      devices:
+        type: array
+        items:
+          type: object
+          properties:
+            device_id:
+              type: string
+            device_type:
+              type: string
+            location:
+              type: string
+            status:
+              type: string
+  mode: mock
+  timeout_ms: 1000
+  mock_template: |
+    {{ "{{if eq .customer_id \"acme-corp\"}}" }}
+    {
+      "devices": [
+        {"device_id": "MOTOR-001", "device_type": "Industrial Motor", "location": "Assembly Line 3", "status": "warning"},
+        {"device_id": "PUMP-002", "device_type": "Industrial Pump", "location": "Cooling System", "status": "critical"},
+        {"device_id": "CONVEYOR-003", "device_type": "Conveyor Belt", "location": "Packaging", "status": "ok"}
+      ]
+    }
+    {{ "{{else if eq .customer_id \"globex-ind\"}}" }}
+    {
+      "devices": [
+        {"device_id": "TURBINE-101", "device_type": "Gas Turbine", "location": "Power Plant", "status": "ok"},
+        {"device_id": "COMPRESSOR-102", "device_type": "Industrial Compressor", "location": "HVAC", "status": "ok"}
+      ]
+    }
+    {{ "{{else}}" }}
+    {"devices": [], "error": "Unknown customer"}
+    {{ "{{end}}" }}

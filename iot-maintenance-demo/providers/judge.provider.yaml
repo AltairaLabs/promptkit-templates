@@ -1,0 +1,16 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Provider
+metadata:
+  name: judge-provider
+spec:
+  id: judge-provider
+  type: openai
+  model: {{ .judge_model }}
+  include_raw_output: false
+  pricing:
+    input_cost_per_1k: 0.00015
+    output_cost_per_1k: 0.0006
+  defaults:
+    temperature: 0.1
+    max_tokens: 500
+    top_p: 1.0

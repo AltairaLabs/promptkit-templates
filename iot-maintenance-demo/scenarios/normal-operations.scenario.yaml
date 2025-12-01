@@ -1,0 +1,46 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Scenario
+metadata:
+  name: normal-operations
+spec:
+  id: normal-operations
+  description: "Standard diagnostic flow that should not require an engineer visit"
+  task_type: troubleshooting
+  provider_group: default
+
+  conversation_assertions:
+    - type: tools_called
+      params:
+        tool_names: ["list_devices", "get_sensor_data"]
+      message: "Should inspect device list and fetch telemetry"
+    - type: content_not_includes
+      params:
+        patterns:
+          - "book"  # avoid scheduling engineer for mild issues
+          - "emergency"
+      message: "Mild issue should not escalate to booking"
+
+  tool_policy:
+    tool_choice: auto
+    max_tool_calls_per_turn: 3
+    max_total_tool_calls: 10
+
+  turns:
+    - role: user
+      content: "One of our pumps got noisy right after startup. Can you see what's going on?"
+      assertions:
+        - type: content_includes_any
+          params:
+            patterns:
+              - "checking"
+              - "look"
+          message: "Assistant should acknowledge investigation"
+    - role: user
+      content: "Customer is ACME and the unit is on the cooling loop."
+      assertions:
+        - type: content_includes_any
+          params:
+            patterns:
+              - "temperature"
+              - "vibration"
+          message: "Assistant should discuss telemetry in follow-up"

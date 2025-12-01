@@ -1,0 +1,4 @@
+responses:
+  - role: assistant
+    content: |
+      This is a mock response. Configure a real provider in providers/openai-gpt4o.provider.yaml or edit these mock responses for offline demos.

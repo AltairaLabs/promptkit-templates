@@ -1,0 +1,92 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Template
+metadata:
+  name: iot-maintenance-demo
+  labels:
+    version: "1.0.0"
+  annotations:
+    description: IoT predictive maintenance demo with self-play security testing
+spec:
+  variables:
+    - name: project_name
+      required: true
+      default: iot-maintenance-demo
+    - name: customer_id
+      required: true
+      default: acme-corp
+    - name: customer_name
+      required: true
+      default: ACME Corporation
+    - name: openai_model
+      required: false
+      default: gpt-4o-mini
+    - name: judge_model
+      required: false
+      default: gpt-4o-mini
+  files:
+    - path: config.arena.yaml
+      source: config.arena.yaml
+    - path: config-v1.arena.yaml
+      source: config-v1.arena.yaml
+    - path: mock.arena.yaml
+      source: mock.arena.yaml
+    - path: prompts/troubleshooter-v1.prompt.yaml
+      source: prompts/troubleshooter-v1.prompt.yaml
+    - path: prompts/troubleshooter-v2.prompt.yaml
+      source: prompts/troubleshooter-v2.prompt.yaml
+    - path: prompts/judge-security.prompt.yaml
+      source: prompts/judge-security.prompt.yaml
+    - path: prompts/mock-tool-scenarios.yaml
+      source: prompts/mock-tool-scenarios.yaml
+    - path: providers/openai-gpt4o.provider.yaml
+      source: providers/openai-gpt4o.provider.yaml
+    - path: providers/judge.provider.yaml
+      source: providers/judge.provider.yaml
+    - path: providers/mock.provider.yaml
+      source: providers/mock.provider.yaml
+    - path: providers/mock-assistant.provider.yaml
+      source: providers/mock-assistant.provider.yaml
+    - path: providers/mock-selfplay.provider.yaml
+      source: providers/mock-selfplay.provider.yaml
+    - path: providers/mock-judge.provider.yaml
+      source: providers/mock-judge.provider.yaml
+    - path: providers/responses/mock-assistant.yaml
+      source: providers/responses/mock-assistant.yaml
+    - path: providers/responses/mock-selfplay.yaml
+      source: providers/responses/mock-selfplay.yaml
+    - path: providers/responses/mock-judge.yaml
+      source: providers/responses/mock-judge.yaml
+    - path: tools/list-devices.tool.yaml
+      source: tools/list-devices.tool.yaml
+    - path: tools/get-sensor-data.tool.yaml
+      source: tools/get-sensor-data.tool.yaml
+    - path: tools/get-error-logs.tool.yaml
+      source: tools/get-error-logs.tool.yaml
+    - path: tools/check-maintenance.tool.yaml
+      source: tools/check-maintenance.tool.yaml
+    - path: tools/get-customer-details.tool.yaml
+      source: tools/get-customer-details.tool.yaml
+    - path: tools/book-engineer.tool.yaml
+      source: tools/book-engineer.tool.yaml
+    - path: scenarios/normal-operations.scenario.yaml
+      source: scenarios/normal-operations.scenario.yaml
+    - path: scenarios/hardware-faults.scenario.yaml
+      source: scenarios/hardware-faults.scenario.yaml
+    - path: scenarios/redteam-selfplay.scenario.yaml
+      source: scenarios/redteam-selfplay.scenario.yaml
+    - path: scenarios/realuser-selfplay.scenario.yaml
+      source: scenarios/realuser-selfplay.scenario.yaml
+    - path: personas/red-team-attacker.persona.yaml
+      source: personas/red-team-attacker.persona.yaml
+    - path: personas/plant-operator.persona.yaml
+      source: personas/plant-operator.persona.yaml
+    - path: sdk-demo/main.go
+      source: sdk-demo/main.go
+    - path: sdk-demo/go.mod
+      source: sdk-demo/go.mod
+    - path: demo-script.sh
+      source: demo-script.sh
+    - path: README.md
+      source: README.md
+    - path: values.example.yaml
+      source: values.example.yaml

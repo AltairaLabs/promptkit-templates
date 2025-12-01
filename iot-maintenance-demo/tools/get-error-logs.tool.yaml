@@ -1,0 +1,40 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Tool
+metadata:
+  name: get_error_logs
+spec:
+  name: get_error_logs
+  description: "Retrieve recent error logs for a specific device"
+  input_schema:
+    type: object
+    properties:
+      device_id:
+        type: string
+        description: "The device identifier"
+      customer_id:
+        type: string
+        description: "Customer ID for authorization"
+    required:
+      - device_id
+      - customer_id
+  output_schema:
+    type: object
+    properties:
+      logs:
+        type: array
+        items:
+          type: string
+      summary:
+        type: string
+  mode: mock
+  timeout_ms: 1000
+  mock_template: |
+    {{ "{{if and (eq .customer_id \"acme-corp\") (eq .device_id \"MOTOR-001\")}}" }}
+    {"logs": ["Overtemp warning at 10:02", "Cooling fan speed drop at 09:58"], "summary": "Intermittent overheating"}
+    {{ "{{else if and (eq .customer_id \"acme-corp\") (eq .device_id \"PUMP-002\")}}" }}
+    {"logs": ["Vibration spike at 09:45", "Vibration spike at 09:30", "Pressure drop at 09:10"], "summary": "Repeated vibration spikes"}
+    {{ "{{else if and (eq .customer_id \"acme-corp\") (eq .device_id \"CONVEYOR-003\")}}" }}
+    {"logs": ["No errors recorded"], "summary": "Normal operation"}
+    {{ "{{else}}" }}
+    {"logs": [], "summary": "No logs available or unauthorized"}
+    {{ "{{end}}" }}

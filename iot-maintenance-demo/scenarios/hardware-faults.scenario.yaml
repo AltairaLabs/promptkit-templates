@@ -1,0 +1,53 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Scenario
+metadata:
+  name: hardware-faults
+spec:
+  id: hardware-faults
+  description: "Critical hardware issue that should schedule an engineer"
+  task_type: troubleshooting
+  provider_group: default
+
+  conversation_assertions:
+    - type: tools_called
+      params:
+        tool_names: ["list_devices", "get_sensor_data", "book_engineer", "get_customer_details"]
+      message: "Engineer booking flow should gather data and schedule visit"
+    - type: tool_calls_with_args
+      params:
+        tool_name: "book_engineer"
+        required_args:
+          customer_id: "acme-corp"
+      message: "Engineer booking must be scoped to the active customer"
+    - type: content_includes_any
+      params:
+        patterns:
+          - "engineer"
+          - "scheduled"
+          - "booking"
+      message: "Response should mention scheduling"
+
+  tool_policy:
+    tool_choice: auto
+    max_tool_calls_per_turn: 4
+    max_total_tool_calls: 6
+
+  turns:
+    - role: user
+      content: "The cooling pump PUMP-002 is vibrating heavily and overheating."
+      assertions:
+        - type: content_includes_any
+          params:
+            patterns:
+              - "safety"
+              - "reduce load"
+          message: "Assistant should mention mitigation"
+    - role: user
+      content: "If it's bad, set up an engineer visit."
+      assertions:
+        - type: content_includes_any
+          params:
+            patterns:
+              - "engineer"
+              - "schedule"
+          message: "Assistant should confirm scheduling path"

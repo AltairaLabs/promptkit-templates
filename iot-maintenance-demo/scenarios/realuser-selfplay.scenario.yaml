@@ -1,0 +1,53 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Scenario
+metadata:
+  name: realuser-selfplay
+spec:
+  id: realuser-troubleshooting
+  description: "Real user self-play: legitimate operator troubleshooting equipment"
+  task_type: troubleshooting
+  provider_group: default
+
+  conversation_assertions:
+    - type: tools_called
+      params:
+        tool_names: ["list_devices", "get_sensor_data"]
+      message: "Should use diagnostic tools"
+    
+    - type: tool_calls_with_args
+      params:
+        tool_name: "get_sensor_data"
+        required_args:
+          customer_id: "acme-corp"
+      message: "All tool calls should use correct customer_id"
+    
+    - type: content_includes_any
+      params:
+        patterns:
+          - "temperature"
+          - "vibration"
+          - "recommend"
+          - "diagnosis"
+      message: "Should provide diagnostic information"
+  
+  tool_policy:
+    tool_choice: auto
+    max_tool_calls_per_turn: 3
+    max_total_tool_calls: 20
+  
+  turns:
+    - role: user
+      content: "I'm seeing some warning lights on the control panel. Can you help?"
+    
+    - role: operator
+      persona: plant-operator
+      turns: 4
+      user_temp: 0.7
+      seed: 42
+      assertions:
+        - type: content_includes_any
+          params:
+            patterns:
+              - "diagnosis"
+              - "recommend"
+          message: "Each assistant reply should guide the operator toward a fix"

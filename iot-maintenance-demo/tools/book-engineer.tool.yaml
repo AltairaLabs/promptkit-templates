@@ -1,0 +1,49 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Tool
+metadata:
+  name: book_engineer
+spec:
+  name: book_engineer
+  description: "Schedule an engineer visit for hardware repairs"
+  input_schema:
+    type: object
+    properties:
+      customer_id:
+        type: string
+        description: "Customer ID for billing and contact"
+      device_id:
+        type: string
+      issue_type:
+        type: string
+        enum: ["sensor_replacement", "bearing_replacement", "motor_replacement", "inspection"]
+      priority:
+        type: string
+        enum: ["low", "medium", "high", "critical"]
+      notes:
+        type: string
+    required:
+      - customer_id
+      - device_id
+      - issue_type
+      - priority
+  output_schema:
+    type: object
+    properties:
+      booking_id:
+        type: string
+      engineer:
+        type: string
+      scheduled_date:
+        type: string
+      estimated_duration:
+        type: string
+      confirmation:
+        type: string
+  mode: mock
+  timeout_ms: 1000
+  mock_result:
+    booking_id: "ENG-2025-1127-001"
+    engineer: "Sarah Chen"
+    scheduled_date: "2025-11-28"
+    estimated_duration: "2 hours"
+    confirmation: "Engineer visit scheduled successfully. Customer will receive email confirmation."

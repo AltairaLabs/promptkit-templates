@@ -1,0 +1,36 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Tool
+metadata:
+  name: get_customer_details
+spec:
+  name: get_customer_details
+  description: "Fetch customer contact details for scheduling"
+  input_schema:
+    type: object
+    properties:
+      customer_id:
+        type: string
+        description: "Customer ID for lookup"
+    required:
+      - customer_id
+  output_schema:
+    type: object
+    properties:
+      company_name:
+        type: string
+      contact_name:
+        type: string
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+  mode: mock
+  timeout_ms: 1000
+  mock_template: |
+    {{ "{{if eq .customer_id \"acme-corp\"}}" }}
+    {"company_name": "ACME Corporation", "contact_name": "Jordan Rivera", "contact_email": "maintenance@acme.example", "contact_phone": "+1-555-0101"}
+    {{ "{{else if eq .customer_id \"globex-ind\"}}" }}
+    {"company_name": "Globex Industrial", "contact_name": "Lee Chen", "contact_email": "ops@globex.example", "contact_phone": "+1-555-0202"}
+    {{ "{{else}}" }}
+    {"company_name": "Unknown", "contact_name": "Unknown", "contact_email": "unknown@example", "contact_phone": ""}
+    {{ "{{end}}" }}

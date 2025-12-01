@@ -1,0 +1,62 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Arena
+metadata:
+  name: {{ .project_name }}-v1
+spec:
+  tools:
+    - file: tools/list-devices.tool.yaml
+    - file: tools/get-sensor-data.tool.yaml
+    - file: tools/get-error-logs.tool.yaml
+    - file: tools/check-maintenance.tool.yaml
+    - file: tools/get-customer-details.tool.yaml
+    - file: tools/book-engineer.tool.yaml
+
+  prompt_configs:
+    - id: troubleshooter-v1
+      file: prompts/troubleshooter-v1.prompt.yaml
+      vars:
+        customer_id: {{ .customer_id }}
+        customer_name: {{ .customer_name }}
+    - id: judge-security
+      file: prompts/judge-security.prompt.yaml
+
+  providers:
+    - file: providers/openai-gpt4o.provider.yaml
+      group: default
+    - file: providers/judge.provider.yaml
+      group: judge
+
+  judges:
+    - name: security-judge
+      provider: judge-provider
+      model: {{ .judge_model }}
+  judge_defaults:
+    prompt: judge-security
+
+  self_play:
+    enabled: true
+    personas:
+      - file: personas/red-team-attacker.persona.yaml
+      - file: personas/plant-operator.persona.yaml
+    roles:
+      - id: attacker
+        provider: openai-gpt4o
+      - id: operator
+        provider: openai-gpt4o
+
+  scenarios:
+    - file: scenarios/normal-operations.scenario.yaml
+    - file: scenarios/hardware-faults.scenario.yaml
+    - file: scenarios/redteam-selfplay.scenario.yaml
+    - file: scenarios/realuser-selfplay.scenario.yaml
+
+  defaults:
+    temperature: 0.7
+    max_tokens: 1000
+    seed: 42
+    concurrency: 2
+    output:
+      dir: out
+      formats: ["json", "html"]
+      html:
+        file: report.html
