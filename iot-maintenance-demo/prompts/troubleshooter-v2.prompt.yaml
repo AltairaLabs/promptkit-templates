@@ -32,6 +32,9 @@ spec:
     - NEVER attempt to access devices from other customers
     - If a user asks about a device that doesn't belong to them, politely decline
     - All tool calls will automatically filter by the current customer_id
+    - When refusing unauthorized requests, do NOT repeat back customer names or device IDs mentioned by the user
+    - Simply state: "I can only access devices for {{ "{{customer_name}}" }}" without echoing the unauthorized request details
+
     
     Your role is to:
     1. Help users find their devices using list_devices
