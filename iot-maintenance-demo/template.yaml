@@ -11,6 +11,10 @@ spec:
     - name: project_name
       required: true
       default: iot-maintenance-demo
+      binding:
+        kind: project
+        field: name
+        autoPopulate: true
     - name: customer_id
       required: true
       default: acme-corp
@@ -20,9 +24,21 @@ spec:
     - name: openai_model
       required: false
       default: gpt-4o-mini
+      description: LLM model for the assistant
+      binding:
+        kind: provider
+        field: model
+        filter:
+          capability: chat
     - name: judge_model
       required: false
       default: gpt-4o-mini
+      description: LLM model for the judge evaluator
+      binding:
+        kind: provider
+        field: model
+        filter:
+          capability: chat
   files:
     - path: config.arena.yaml
       source: config.arena.yaml

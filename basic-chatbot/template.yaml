@@ -11,6 +11,10 @@ spec:
     - name: project_name
       required: true
       default: my-chatbot-tests
+      binding:
+        kind: project
+        field: name
+        autoPopulate: true
   files:
     - path: arena.yaml
       content: |

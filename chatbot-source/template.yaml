@@ -11,12 +11,20 @@ spec:
     - name: project_name
       required: true
       default: my-chatbot-source
+      binding:
+        kind: project
+        field: name
+        autoPopulate: true
     - name: greeting
       required: false
       default: "Hello!"
     - name: model
       required: false
       default: mock-model
+      description: LLM model to use
+      binding:
+        kind: provider
+        field: model
   files:
     - path: arena.yaml
       content: |
