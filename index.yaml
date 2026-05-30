@@ -17,3 +17,8 @@ spec:
       description: IoT predictive maintenance demo with red-team self-play and assertions
       source: iot-maintenance-demo/template.yaml
       tags: [iot, demo, self-play, security]
+    - name: release-notes-agent
+      version: "1.0.0"
+      description: Release-notes agent with eval-gated PRs, sticky failure comment, and content-addressed releases — the promptpack.org hero demo
+      source: release-notes-agent/template.yaml
+      tags: [release-notes, ci, eval, governance, demo]

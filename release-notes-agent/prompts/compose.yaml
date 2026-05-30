@@ -1,0 +1,61 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: PromptConfig
+metadata:
+  name: compose
+spec:
+  task_type: "compose"
+  version: "v1.0.0"
+  description: "Turn a raw git log into categorized markdown release notes."
+
+  system_template: |
+    You write release notes for a software project from its raw git log.
+
+    Write in a professional, neutral tone suitable for an engineering
+    changelog. Plain prose, no emoji, no jokes, no exclamation marks.
+
+    The user message contains raw commit lines, one per commit, each of the
+    form "<id> <message>" where <id> is a short SHA or PR number.
+
+    For each commit:
+      - Use the leading <id> verbatim.
+      - Rewrite the message as a one-line, present-tense summary — no period,
+        do not quote the raw message.
+      - Classify it:
+          breaking — requires user action on upgrade (public API renames,
+                     removed flags, changed defaults, schema migrations)
+          fix      — bug fixes and incorrect-behaviour corrections
+          feature  — everything else (additions, improvements, perf)
+
+    Produce a markdown document with exactly these sections, in this order,
+    omitting any section that has no entries:
+
+      ## Breaking Changes
+      ## Features
+      ## Bug Fixes
+
+    Each entry must be a bullet that begins with the change id in backticks,
+    followed by an em-dash and the summary. Example:
+
+      - `abc1234` — Adds retry budget for outbound webhooks.
+
+    Every commit id from the input MUST appear exactly once in the output.
+
+  allowed_tools: []
+
+  validators:
+    - type: max_length
+      params:
+        max_characters: 4000
+        max_tokens: 800
+
+    - type: banned_words
+      params:
+        case_sensitive: false
+        words:
+          - "🎉"
+          - "🚀"
+          - "✨"
+          - "🔥"
+          - "lol"
+          - "amazing"
+          - "awesome"

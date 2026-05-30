@@ -1,0 +1,60 @@
+# Release-notes agent — declarative behaviour spec.
+#
+# The agent is a single prompt, no source code: it reads a raw git log and
+# produces categorized markdown release notes (Breaking / Features / Bug
+# Fixes) in a professional engineering tone.
+#
+# The eval scenarios feed a raw commit log and assert the rendered notes are
+# complete, well-formed, and professional — a casual/emoji tone regression
+# trips the banned_words validator and the LLM tone judge. See
+# scenarios/*.scenario.yaml.
+#
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Arena
+metadata:
+  name: release-notes-arena
+spec:
+  prompt_configs:
+    - id: compose
+      file: prompts/compose.yaml
+    - id: judge-tone
+      file: prompts/judge-tone.yaml
+
+  providers:
+    - file: providers/claude-haiku.provider.yaml
+      group: default
+    - file: providers/openai-mini.provider.yaml
+      group: default
+    - file: providers/mock.provider.yaml
+      group: default
+    - file: providers/mock-judge.provider.yaml
+      group: judge
+
+  judges:
+    # Default to the mock judge so the hermetic mock CI tier needs no API keys
+    # and stays deterministic. The real-provider CI tier rebinds this to real
+    # Claude at invocation time via `override-providers: mock-judge=claude-haiku`
+    # (promptarena --override-provider), so the LLM-judge tone check runs for
+    # real there without a second judge definition.
+    - name: tone-judge
+      provider: mock-judge
+
+  judge_defaults:
+    prompt: judge-tone
+
+  scenarios:
+    - file: scenarios/happy-path.scenario.yaml
+    - file: scenarios/tone-check.scenario.yaml
+
+  defaults:
+    temperature: 0.3
+    max_tokens: 1500
+    seed: 42
+    concurrency: 2
+    output:
+      dir: out
+      formats: ["json", "html", "junit", "markdown"]
+      html:
+        file: report.html
+    fail_on:
+      - provider_error

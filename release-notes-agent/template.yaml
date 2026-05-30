@@ -1,0 +1,108 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Template
+metadata:
+  name: release-notes-agent
+  labels:
+    version: "1.0.0"
+  annotations:
+    description: |
+      Release-notes agent packaged with the full engineering loop —
+      eval-gated PRs, sticky failure comment, content-addressed GitHub
+      Release on merge. The pack used by the promptpack.org hero demo.
+spec:
+  variables:
+    - name: project_name
+      required: true
+      default: release-notes-agent
+      binding:
+        kind: project
+        field: name
+        autoPopulate: true
+  files:
+    - path: config.arena.yaml
+      source: config.arena.yaml
+    - path: prompts/compose.yaml
+      source: prompts/compose.yaml
+    - path: prompts/judge-tone.yaml
+      source: prompts/judge-tone.yaml
+    - path: providers/claude-haiku.provider.yaml
+      source: providers/claude-haiku.provider.yaml
+    - path: providers/openai-mini.provider.yaml
+      source: providers/openai-mini.provider.yaml
+    - path: providers/mock.provider.yaml
+      source: providers/mock.provider.yaml
+    - path: providers/mock-judge.provider.yaml
+      source: providers/mock-judge.provider.yaml
+    - path: scenarios/happy-path.scenario.yaml
+      source: scenarios/happy-path.scenario.yaml
+    - path: scenarios/tone-check.scenario.yaml
+      source: scenarios/tone-check.scenario.yaml
+    - path: mock-responses.yaml
+      source: mock-responses.yaml
+    - path: mock-responses-judge.yaml
+      source: mock-responses-judge.yaml
+    - path: .github/workflows/pack-ci.yml
+      source: .github/workflows/pack-ci.yml
+    - path: .env.example
+      source: .env.example
+    - path: .gitignore
+      source: .gitignore
+    - path: README.md
+      content: |
+        # {{ .project_name }}
+
+        A release-notes agent declared as a PromptPack — one prompt that turns
+        a raw git log into categorized markdown release notes, gated in CI
+        against real models and shipped as an immutable artifact on merge.
+
+        This is the same pack used by the [promptpack.org](https://promptpack.org)
+        hero demo. Rendered from the `release-notes-agent` community template.
+
+        ## What's in the box
+
+        - `prompts/compose.yaml` — the agent (one prompt, raw git log → markdown release notes).
+        - `prompts/judge-tone.yaml` — LLM-judge that scores release-notes tone.
+        - `scenarios/` — eval scenarios with assertions, a `banned_words` guardrail, and the LLM-judge backstop.
+        - `providers/` — Claude + OpenAI for the real eval, plus a mock provider for tokenless local runs.
+        - `.github/workflows/pack-ci.yml` — the engineering loop:
+          - every PR runs the eval against real models,
+          - the result is posted back as a sticky PR comment (judge score + guardrail violations),
+          - on merge to `main`, `packc` compiles and publishes a **content-addressed GitHub Release** (`pack-<sha12>`).
+
+        ## Try it locally (no API keys needed)
+
+        ```bash
+        npm install -g @altairalabs/promptarena @altairalabs/packc
+        promptarena run --providers mock
+        ```
+
+        The mock provider returns fixed fixture output — fine for sanity-checking the wiring, not for catching real regressions.
+
+        ## Set it up for real
+
+        Three one-time steps after you push this to a GitHub repo:
+
+        1. **Add API key secrets** so the eval can call the real models:
+           ```bash
+           gh secret set ANTHROPIC_API_KEY -R <owner>/<repo>
+           gh secret set OPENAI_API_KEY    -R <owner>/<repo>
+           ```
+        2. **Enable branch protection on `main`** requiring the `PromptArena eval (real providers)` status check to pass. Without this, a red eval *marks* the PR red but doesn't actually block merge. The minimum:
+           ```bash
+           gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input - <<'JSON'
+           {
+             "required_status_checks": { "strict": false, "contexts": ["PromptArena eval (real providers)"] },
+             "enforce_admins": false,
+             "required_pull_request_reviews": null,
+             "restrictions": null
+           }
+           JSON
+           ```
+        3. **Open a PR** that changes `prompts/compose.yaml` and watch the eval gate it. (Want a guaranteed-red demo PR? Swap the professional-tone instruction for "be casual and fun, sprinkle in emoji.")
+
+        ## Why this template exists
+
+        Prompts usually ship as untested strings buried in code. PromptPack treats agent behavior the way you treat API services: versioned, tested in CI, reviewed in PRs, shipped as an immutable artifact. This template hands you the whole loop in one render.
+
+        - Spec: <https://promptpack.org>
+        - Hero demo this is rendered from: <https://github.com/AltairaLabs/promptpack-demo>

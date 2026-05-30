@@ -57,6 +57,7 @@ promptarena templates list --index internal
 - `basic-chatbot` — minimal mock-provider chatbot with inline file content.
 - `chatbot-source` — similar chatbot, but uses `files[].source` to pull file bodies from separate files in the template package.
 - `iot-maintenance-demo` — IoT predictive maintenance demo with red-team self-play, assertions, and SDK starter.
+- `release-notes-agent` — release-notes agent packaged with the full engineering loop: eval-gated PRs against real models, a sticky failure comment, and a content-addressed GitHub Release on merge. The pack used by the [promptpack.org](https://promptpack.org) hero demo.
 
 ## Contributing
 - Add template packages under a directory matching the template name.
