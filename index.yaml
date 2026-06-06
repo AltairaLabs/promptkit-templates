@@ -22,3 +22,8 @@ spec:
       description: Release-notes agent with eval-gated PRs, sticky failure comment, and content-addressed releases — the promptpack.org hero demo
       source: release-notes-agent/template.yaml
       tags: [release-notes, ci, eval, governance, demo]
+    - name: voice-refund-demo
+      version: "1.0.0"
+      description: Voice-agent self-play — hostile TTS-synthesized callers vs a refund agent with verification gates; keyless CI via mock-duplex, real realtime LLMs (Gemini Live, OpenAI Realtime) for the live demo
+      source: voice-refund-demo/template.yaml
+      tags: [voice, audio, duplex, self-play, demo]

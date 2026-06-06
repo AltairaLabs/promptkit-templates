@@ -1,0 +1,120 @@
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Template
+metadata:
+  name: voice-refund-demo
+  labels:
+    version: "1.0.0"
+  annotations:
+    description: >-
+      Voice-agent self-play — hostile TTS-synthesized callers vs a refund agent
+      with verification gates. Runs keyless in CI via mock-duplex; drives real
+      realtime LLMs (Gemini Live, OpenAI Realtime) for the live demo.
+spec:
+  variables:
+    - name: project_name
+      required: true
+      default: voice-refund-demo
+      description: Project directory and arena name
+      binding:
+        kind: project
+        field: name
+        autoPopulate: true
+
+  files:
+    # config.arena.yaml is templated for {{.project_name}}. Everything else is
+    # copied verbatim (raw): the prompt and the three mock_template tools carry
+    # runtime {{ }} that must NOT be rendered at init time, and the audio
+    # fixtures are binary.
+    - path: config.arena.yaml
+      source: config.arena.yaml
+
+    - path: README.md
+      source: README.md
+      raw: true
+    - path: mock-responses.yaml
+      source: mock-responses.yaml
+      raw: true
+
+    - path: prompts/refund-agent.prompt.yaml
+      source: prompts/refund-agent.prompt.yaml
+      raw: true
+
+    - path: personas/aggressive-entitled.persona.yaml
+      source: personas/aggressive-entitled.persona.yaml
+      raw: true
+    - path: personas/impersonator.persona.yaml
+      source: personas/impersonator.persona.yaml
+      raw: true
+    - path: personas/patient-customer.persona.yaml
+      source: personas/patient-customer.persona.yaml
+      raw: true
+    - path: personas/anxious-recipient.persona.yaml
+      source: personas/anxious-recipient.persona.yaml
+      raw: true
+
+    - path: scenarios/aggressive-refund.scenario.yaml
+      source: scenarios/aggressive-refund.scenario.yaml
+      raw: true
+    - path: scenarios/impersonator-refund.scenario.yaml
+      source: scenarios/impersonator-refund.scenario.yaml
+      raw: true
+    - path: scenarios/patient-baseline.scenario.yaml
+      source: scenarios/patient-baseline.scenario.yaml
+      raw: true
+    - path: scenarios/anxious-delivery.scenario.yaml
+      source: scenarios/anxious-delivery.scenario.yaml
+      raw: true
+
+    - path: tools/lookup-order.tool.yaml
+      source: tools/lookup-order.tool.yaml
+      raw: true
+    - path: tools/check-warranty-status.tool.yaml
+      source: tools/check-warranty-status.tool.yaml
+      raw: true
+    - path: tools/issue-refund.tool.yaml
+      source: tools/issue-refund.tool.yaml
+      raw: true
+    - path: tools/escalate-to-human.tool.yaml
+      source: tools/escalate-to-human.tool.yaml
+      raw: true
+
+    - path: providers/gemini-2-flash.provider.yaml
+      source: providers/gemini-2-flash.provider.yaml
+      raw: true
+    - path: providers/openai-gpt4o-realtime.provider.yaml
+      source: providers/openai-gpt4o-realtime.provider.yaml
+      raw: true
+    - path: providers/mock-duplex.provider.yaml
+      source: providers/mock-duplex.provider.yaml
+      raw: true
+    - path: providers/openai-gpt4o-mini-text.provider.yaml
+      source: providers/openai-gpt4o-mini-text.provider.yaml
+      raw: true
+    - path: providers/cartesia-confident-man.provider.yaml
+      source: providers/cartesia-confident-man.provider.yaml
+      raw: true
+    - path: providers/cartesia-friendly-woman.provider.yaml
+      source: providers/cartesia-friendly-woman.provider.yaml
+      raw: true
+    - path: providers/elevenlabs-arnold.provider.yaml
+      source: providers/elevenlabs-arnold.provider.yaml
+      raw: true
+    - path: providers/openai-nova.provider.yaml
+      source: providers/openai-nova.provider.yaml
+      raw: true
+    - path: providers/mock-tts.provider.yaml
+      source: providers/mock-tts.provider.yaml
+      raw: true
+    - path: providers/hf.provider.yaml
+      source: providers/hf.provider.yaml
+      raw: true
+
+    - path: audio/greeting.pcm
+      source: audio/greeting.pcm
+      raw: true
+    - path: audio/question.pcm
+      source: audio/question.pcm
+      raw: true
+    - path: audio/funfact.pcm
+      source: audio/funfact.pcm
+      raw: true

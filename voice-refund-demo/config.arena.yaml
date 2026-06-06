@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://promptkit.altairalabs.ai/schemas/latest/arena.json
+#
+# Voice Refund Demo
+# Hostile customer self-play against a refund agent with verification gates.
+# Drives realtime voice LLMs (Gemini Live, OpenAI Realtime) via TTS-synthesized
+# personas; mock-duplex provider runs the same scenarios in CI without API keys.
+#
+apiVersion: promptkit.altairalabs.ai/v1alpha1
+kind: Arena
+metadata:
+  name: {{.project_name}}
+
+spec:
+  prompt_configs:
+    - id: refund-agent
+      file: prompts/refund-agent.prompt.yaml
+
+  # All providers — LLM and TTS — live in the unified `providers:` list.
+  # The loader routes each entry by its `role:` field; TTS entries skip the
+  # agent-under-test matrix and are looked up by voice bindings below.
+  providers:
+    - file: providers/gemini-2-flash.provider.yaml
+    - file: providers/openai-gpt4o-realtime.provider.yaml
+    - file: providers/mock-duplex.provider.yaml
+    - file: providers/openai-gpt4o-mini-text.provider.yaml
+    - file: providers/cartesia-confident-man.provider.yaml
+    - file: providers/cartesia-friendly-woman.provider.yaml
+    - file: providers/elevenlabs-arnold.provider.yaml
+    - file: providers/openai-nova.provider.yaml
+    - file: providers/mock-tts.provider.yaml
+    # Inference provider (role: inference) for audio_emotion scoring on
+    # the aggressive-refund scenario. Active when HF_TOKEN is exported;
+    # assertions skip cleanly otherwise.
+    - file: providers/hf.provider.yaml
+
+  voices:
+    # Default: keyless out of the box — every voice plays canned PCM audio via
+    # mock-tts, so `promptarena run --provider mock-duplex --ci` needs no keys.
+    # For the real-provider/recording demo, re-point each `provider:` to its
+    # vendor (shown in the comments) and export that vendor's API key.
+    - id: confident-man
+      provider: mock-tts # real: cartesia-confident-man (CARTESIA_API_KEY)
+    - id: friendly-woman
+      provider: mock-tts # real: cartesia-friendly-woman (CARTESIA_API_KEY)
+    - id: arnold-expressive
+      provider: mock-tts # real: elevenlabs-arnold (ELEVENLABS_API_KEY)
+    - id: nova
+      provider: mock-tts # real: openai-nova (OPENAI_API_KEY)
+
+  scenarios:
+    - file: scenarios/aggressive-refund.scenario.yaml
+    - file: scenarios/impersonator-refund.scenario.yaml
+    - file: scenarios/patient-baseline.scenario.yaml
+    - file: scenarios/anxious-delivery.scenario.yaml
+
+  tools:
+    - file: tools/lookup-order.tool.yaml
+    - file: tools/check-warranty-status.tool.yaml
+    - file: tools/issue-refund.tool.yaml
+    - file: tools/escalate-to-human.tool.yaml
+
+  self_play:
+    personas:
+      - file: personas/aggressive-entitled.persona.yaml
+      - file: personas/impersonator.persona.yaml
+      - file: personas/patient-customer.persona.yaml
+      - file: personas/anxious-recipient.persona.yaml
+    roles:
+      - id: selfplay-user
+        # Default to mock-duplex for keyless CI runs. The mock provider routes
+        # selfplay calls (which carry `mock_persona_id` in request metadata) to
+        # the per-persona `selfplay:` block in mock-responses.yaml; agent-side
+        # streaming calls fall through to the per-scenario `scenarios:` block.
+        # Swap to `openai-gpt4o-mini-text` for real-provider recording mode —
+        # see README "Real-provider mode" section.
+        provider: mock-duplex
+
+  defaults:
+    temperature: 0.7
+    max_tokens: 1000
+    seed: 42
+    concurrency: 1
+    output:
+      dir: out
+      formats:
+        - json
+        - html
+      html:
+        file: report.html
+      recording:
+        enabled: true
+        dir: recordings
