@@ -14,7 +14,7 @@ spec:
   # and mock_template tools). Enforced at init — older promptarena fails with a
   # clear upgrade message instead of a corrupted scaffold.
   requires:
-    cli_version: ">=1.5.0"
+    cli_version: ">=1.4.13"
   variables:
     - name: project_name
       required: true
