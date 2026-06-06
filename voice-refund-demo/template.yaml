@@ -10,6 +10,11 @@ metadata:
       with verification gates. Runs keyless in CI via mock-duplex; drives real
       realtime LLMs (Gemini Live, OpenAI Realtime) for the live demo.
 spec:
+  # Needs the raw-file flag (binary PCM fixtures + runtime {{ }} in the prompt
+  # and mock_template tools). Enforced at init — older promptarena fails with a
+  # clear upgrade message instead of a corrupted scaffold.
+  requires:
+    cli_version: ">=1.5.0"
   variables:
     - name: project_name
       required: true
